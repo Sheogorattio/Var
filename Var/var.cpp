@@ -31,15 +31,15 @@ var::var(const char* s) {
 	str_var.Input(s);
 }
 
-int var::Geti_num() {
+int var::Geti_num()const {
 	return i_var;
 }
 
-double var::Getd_num() {
+double var::Getd_num() const {
 	return d_var;
 }
 
-MyString& var::Getstr_var() {
+MyString var::Getstr_var()const {
 	return str_var;
 }
 
@@ -113,7 +113,7 @@ var& var::operator=(const char* str) {
 
 
 
-int var::StringToNumber(const char * s) {
+int var::StringToNumber(const char * s) const {
 	int const zero_ascii = 48, nine_ascii = 57;
 	int result = 0, i = 0;
 	const char* ptr = s;
@@ -128,7 +128,7 @@ int var::StringToNumber(const char * s) {
 	}
 	return result;
 }
-char* var::NumberToString(const int number) {
+char* var::NumberToString(const int number)const {
 	int const zero_ascii = 48;
 	int size_definition = number, size = 1;
 	while (size_definition / 10 > 0) {
@@ -203,7 +203,9 @@ var& var::operator+=(const int a) {
 		d_var += a;
 	}
 	else {
-		str_var.MyStrCat(NumberToString(a));
+		char* s = NumberToString(a);
+		str_var.MyStrCat(s);
+		delete[]s;
 	}
 	return *this;
 }
@@ -215,7 +217,9 @@ var& var::operator+=(const double a) {
 		d_var += a;
 	}
 	else {
-		str_var.MyStrCat(NumberToString((int)a));
+		char* s = NumberToString(a);
+		str_var.MyStrCat(s);
+		delete[]s;
 	}
 	return *this;
 }
@@ -252,7 +256,9 @@ var& var::operator-=(const int a) {
 		d_var -= a;
 	}
 	else {
-		str_var.MyStrCat(NumberToString(a));
+		char* s = NumberToString(a);
+		str_var.MyStrCat(s);
+		delete[]s;
 	}
 	return *this;
 }
@@ -264,7 +270,9 @@ var& var::operator-=(const double a) {
 		d_var -= a;
 	}
 	else {
-		str_var.MyStrCat(NumberToString((int)a));
+		char* s = NumberToString(a);
+		str_var.MyStrCat(s);
+		delete[]s;
 	}
 	return *this;
 }
@@ -291,4 +299,1074 @@ var& var::operator-=(var a) {
 		str_var.MyStrCat(a);
 	}
 	return *this;
+}
+
+var var::operator+(const int a) {
+	var obj = *this;
+	if (obj.i_var != NULL) {
+		obj.i_var += a;
+	}
+	else if (d_var != NULL) {
+		obj.d_var += a;
+	}
+	else {
+		char* s = NumberToString(a);
+		obj.str_var.MyStrCat(s);
+		delete[]s;
+	}
+	return obj;
+}
+var var::operator+(const double a) {
+	var obj = *this;
+	if (obj.i_var != NULL) {
+		obj.i_var += (int)a;
+	}
+	else if (obj.d_var != NULL) {
+		obj.d_var += a;
+	}
+	else {
+		char* s = NumberToString(a);
+		obj.str_var.MyStrCat(s);
+		delete[]s;
+	}
+	return obj;
+}
+var var::operator+(const char* s) {
+	var obj = *this;
+	if (obj.i_var != NULL) {
+		obj.i_var += StringToNumber(s);
+	}
+	else if (obj.d_var != NULL) {
+		obj.d_var += (double)StringToNumber(s);
+	}
+	else {
+		obj.str_var.MyStrCat(s);
+	}
+	return obj;
+}
+var var::operator+(var& a) {
+	var obj = *this;
+	if (obj.i_var != NULL) {
+		obj.i_var += int(a);
+	}
+	else if (obj.d_var != NULL) {
+		obj.d_var += double(a);
+	}
+	else {
+		obj.str_var.MyStrCat(a);
+	}
+	return obj;
+}
+
+var var::operator-(const int a) {
+	var obj=*this;
+	if (obj.i_var != NULL) {
+		obj.i_var -= a;
+	}
+	else if (obj.d_var != NULL) {
+		obj.d_var -= a;
+	}
+	else {
+		char* s = NumberToString(a);
+		obj.str_var.MyStrCat(s);
+		delete[]s;
+	}
+	return obj;
+}
+var var::operator-(const double a) {
+	var obj=*this;
+	if (obj.i_var != NULL) {
+		obj.i_var -= (int)a;
+	}
+	else if (obj.d_var != NULL) {
+		obj.d_var -= a;
+	}
+	else {
+		char* s = NumberToString((int)a);
+		obj.str_var.MyStrCat(s);
+		delete[] s;
+	}
+	return obj;
+}
+var var::operator-(const char* s) {
+	var obj = *this;
+	if (obj.i_var != NULL) {
+		obj.i_var -= StringToNumber(s);
+	}
+	else if (obj.d_var != NULL) {
+		obj.d_var -= (double)StringToNumber(s);
+	}
+	else {
+		obj.str_var.MyStrCat(s);
+	}
+	return obj;
+}
+var var::operator-(var& a) {
+	var obj = *this;
+	if (obj.i_var != NULL) {
+		obj.i_var -= int(a);
+	}
+	else if (obj.d_var != NULL) {
+		obj.d_var -= double(a);
+	}
+	else {
+		obj.str_var.MyStrCat(a);
+	}
+	return obj;
+}
+
+int operator-(int a, const var& obj) {
+	int rez = a;
+	int val;
+	if (obj.Geti_num() != NULL) {
+		val = obj.Geti_num();
+	}
+	else if(obj.Getd_num() != NULL) {
+		val = (int)obj.Getd_num();
+	}
+	else {
+		val = obj.StringToNumber(obj.Getstr_var());
+	}
+	rez -= val;
+	return rez;
+}
+double operator-(double a, const var& obj) {
+	double rez = a;
+	double val;
+	if (obj.Geti_num() != NULL) {
+		val = (double)obj.Geti_num();
+	}
+	else if (obj.Getd_num() != NULL) {
+		val = obj.Getd_num();
+	}
+	else {
+		val = (double)obj.StringToNumber(obj.Getstr_var());
+	}
+	rez -= val;
+	return rez;
+}
+
+int operator+(int a, const var& obj) {
+	int rez = a;
+	int val;
+	if (obj.Geti_num() != NULL) {
+		val = obj.Geti_num();
+	}
+	else if (obj.Getd_num() != NULL) {
+		val = (int)obj.Getd_num();
+	}
+	else {
+		val = obj.StringToNumber(obj.Getstr_var());
+	}
+	rez += val;
+	return rez;
+}
+double operator+(double a, const var& obj) {
+	double rez = a;
+	double val;
+	if (obj.Geti_num() != NULL) {
+		val = (double)obj.Geti_num();
+	}
+	else if (obj.Getd_num() != NULL) {
+		val = obj.Getd_num();
+	}
+	else {
+		val = (double)obj.StringToNumber(obj.Getstr_var());
+	}
+	rez += val;
+	return rez;
+}
+char* operator+(char* s, const var& obj) {
+	MyString rez = obj.Getstr_var();
+	rez.MyStrCat(s);
+	return rez.GetStr();
+}
+
+var& var::operator*=(const int a) {
+	if (i_var != NULL) {
+		i_var *= a;
+	}
+	else if (d_var != NULL) {
+		d_var *= a;
+	}
+	else {
+		char* s = NumberToString(a);
+		char* t = GetStr();
+		int s_size = strlen(s);
+		int t_size = strlen(t);
+		int counter = 0;
+		for (int i = 0; i < s_size; i++) {
+			for (int j = 0; j < t_size; j++) {
+				if (s[i] == t[j]) {
+					counter++;
+				}
+			}
+		}
+		char* rez = new char[counter + 1];
+		rez[counter] = '\0';
+		counter = 0;
+		for (int i = 0; i < s_size; i++) {
+			for (int j = 0; j < t_size; j++) {
+				if (s[i] == t[j]) {
+					rez[counter] = s[i];
+					counter++;
+				}
+			}
+		}
+		Setstr_var(rez);
+		delete[] rez;
+		delete[]s;
+	}
+	return *this;
+}
+var& var::operator*=(const double a) {
+	if (i_var != NULL) {
+		i_var *= (int)a;
+	}
+	else if (d_var != NULL) {
+		d_var *= a;
+	}
+	else {
+		char* s = NumberToString((int)a);
+		char* t = GetStr();
+		int s_size = strlen(s);
+		int t_size = strlen(t);
+		int counter = 0;
+		for (int i = 0; i < s_size; i++) {
+			for (int j = 0; j < t_size; j++) {
+				if (s[i] == t[j]) {
+					counter++;
+				}
+			}
+		}
+		char* rez = new char[counter + 1];
+		rez[counter] = '\0';
+		counter = 0;
+		for (int i = 0; i < s_size; i++) {
+			for (int j = 0; j < t_size; j++) {
+				if (s[i] == t[j]) {
+					rez[counter] = s[i];
+					counter++;
+				}
+			}
+		}
+		Setstr_var(rez);
+		delete[] rez;
+		delete[]s;
+	}
+	return *this;
+}
+var& var::operator*=(const char* s) {
+	if (i_var != NULL) {
+		i_var *= StringToNumber(s);
+	}
+	else if (d_var != NULL) {
+		d_var *= (double)StringToNumber(s);
+	}
+	else {
+		char* t = GetStr();
+		int s_size = strlen(s);
+		int t_size = strlen(t);
+		int counter = 0;
+		for (int i = 0; i < s_size; i++) {
+			for (int j = 0; j < t_size; j++) {
+				if (s[i] == t[j]) {
+					counter++;
+				}
+			}
+		}
+		char* rez = new char[counter + 1];
+		rez[counter] = '\0';
+		counter = 0;
+		for (int i = 0; i < s_size; i++) {
+			for (int j = 0; j < t_size; j++) {
+				if (s[i] == t[j]) {
+					rez[counter] = s[i];
+					counter++;
+				}
+			}
+		}
+		Setstr_var(rez);
+		delete[] rez;
+	}
+	return *this;
+}
+var& var::operator*=( var& a) {
+	if (i_var != NULL) {
+		i_var *= int(a);
+	}
+	else if (d_var != NULL) {
+		d_var *= double(a);
+	}
+	else {
+		char* s = a.GetStr();
+		char* t = GetStr();
+		int s_size = strlen(s);
+		int t_size = strlen(t);
+		int counter = 0;
+		for (int i = 0; i < s_size; i++) {
+			for (int j = 0; j < t_size; j++) {
+				if (s[i] == t[j]) {
+					counter++;
+				}
+			}
+		}
+		char* rez = new char[counter + 1];
+		rez[counter] = '\0';
+		counter = 0;
+		for (int i = 0; i < s_size; i++) {
+			for (int j = 0; j < t_size; j++) {
+				if (s[i] == t[j]) {
+					rez[counter] = s[i];
+					counter++;
+				}
+			}
+		}
+		Setstr_var(rez);
+		delete[] rez;
+	}
+	return *this;
+}
+
+var& var::operator/=(const int a) {
+	if (i_var != NULL) {
+		i_var /= a;
+	}
+	else if (d_var != NULL) {
+		d_var /= a;
+	}
+	else {
+		char* s = NumberToString(a);
+		char* t = GetStr();
+		int s_size = strlen(s);
+		int t_size = strlen(t);
+		int counter = 0;
+		bool check = 0;
+		for (int i = 0; i < s_size; i++) {
+			for (int j = 0; j < t_size; j++) {
+				if (s[i] == t[j]) {
+					check = 1;
+					if (check == 0) {
+						counter++;
+						check = 0;
+					}
+				}
+			}
+		}
+		char* rez = new char[counter + 1];
+		rez[counter] = '\0';
+		counter = 0;
+		for (int i = 0; i < s_size; i++) {
+			for (int j = 0; j < t_size; j++) {
+				if (s[i] == t[j]) {
+					check = 1;
+					if (check == 0) {
+						rez[counter] = s[i];
+						counter++;
+						check = 0;
+					}
+				}
+			}
+		}
+		Setstr_var(rez);
+		delete[] rez;
+		delete[]s;
+	}
+	return *this;
+}
+var& var::operator/=(const double a) {
+	if (i_var != NULL) {
+		i_var /= (double)a;
+	}
+	else if (d_var != NULL) {
+		d_var /= a;
+	}
+	else {
+		char* s = NumberToString((int)a);
+		char* t = GetStr();
+		int s_size = strlen(s);
+		int t_size = strlen(t);
+		int counter = 0;
+		bool check = 0;
+		for (int i = 0; i < s_size; i++) {
+			for (int j = 0; j < t_size; j++) {
+				if (s[i] == t[j]) {
+					check = 1;
+					if (check == 0) {
+						counter++;
+						check = 0;
+					}
+				}
+			}
+		}
+		char* rez = new char[counter + 1];
+		rez[counter] = '\0';
+		counter = 0;
+		for (int i = 0; i < s_size; i++) {
+			for (int j = 0; j < t_size; j++) {
+				if (s[i] == t[j]) {
+					check = 1;
+					if (check == 0) {
+						rez[counter] = s[i];
+						counter++;
+						check = 0;
+					}
+				}
+			}
+		}
+		Setstr_var(rez);
+		delete[] rez;
+		delete[]s;
+	}
+	return *this;
+}
+var& var::operator/=(const char* s) {
+	if (i_var != NULL) {
+		i_var /= StringToNumber(s);
+	}
+	else if (d_var != NULL) {
+		d_var /= StringToNumber(s);
+	}
+	else {
+		char* t = GetStr();
+		int s_size = strlen(s);
+		int t_size = strlen(t);
+		int counter = 0;
+		bool check = 0;
+		for (int i = 0; i < s_size; i++) {
+			for (int j = 0; j < t_size; j++) {
+				if (s[i] == t[j]) {
+					check = 1;
+					if (check == 0) {
+						counter++;
+						check = 0;
+					}
+				}
+			}
+		}
+		char* rez = new char[counter + 1];
+		rez[counter] = '\0';
+		counter = 0;
+		for (int i = 0; i < s_size; i++) {
+			for (int j = 0; j < t_size; j++) {
+				if (s[i] == t[j]) {
+					check = 1;
+					if (check == 0) {
+						rez[counter] = s[i];
+						counter++;
+						check = 0;
+					}
+				}
+			}
+		}
+		Setstr_var(rez);
+		delete[] rez;
+	}
+	return *this;
+}
+var& var::operator/=(var& a) {
+	if (i_var != NULL) {
+		i_var /= (int)a;
+	}
+	else if (d_var != NULL) {
+		d_var /= (double)a;
+	}
+	else {
+		char* s = a.GetStr();
+		char* t = GetStr();
+		int s_size = strlen(s);
+		int t_size = strlen(t);
+		int counter = 0;
+		bool check = 0;
+		for (int i = 0; i < s_size; i++) {
+			for (int j = 0; j < t_size; j++) {
+				if (s[i] == t[j]) {
+					check = 1;
+					if (check == 0) {
+						counter++;
+						check = 0;
+					}
+				}
+			}
+		}
+		char* rez = new char[counter + 1];
+		rez[counter] = '\0';
+		counter = 0;
+		for (int i = 0; i < s_size; i++) {
+			for (int j = 0; j < t_size; j++) {
+				if (s[i] == t[j]) {
+					check = 1;
+					if (check == 0) {
+						rez[counter] = s[i];
+						counter++;
+						check = 0;
+					}
+				}
+			}
+		}
+		Setstr_var(rez);
+		delete[] rez;
+	}
+	return *this;
+}
+
+var var::operator*(const int a) {
+	var obj = *this;
+	if (obj.i_var != NULL) {
+		obj.i_var *= a;
+	}
+	else if (obj.d_var != NULL) {
+		obj.d_var *= a;
+	}
+	else {
+		char* s = NumberToString(a);
+		char* t = obj.GetStr();
+		int s_size = strlen(s);
+		int t_size = strlen(t);
+		int counter = 0;
+		for (int i = 0; i < s_size; i++) {
+			for (int j = 0; j < t_size; j++) {
+				if (s[i] == t[j]) {
+					counter++;
+				}
+			}
+		}
+		char* rez = new char[counter + 1];
+		rez[counter] = '\0';
+		counter = 0;
+		for (int i = 0; i < s_size; i++) {
+			for (int j = 0; j < t_size; j++) {
+				if (s[i] == t[j]) {
+					rez[counter] = s[i];
+					counter++;
+				}
+			}
+		}
+		obj.Setstr_var(rez);
+		delete[] rez;
+		delete[]s;
+	}
+	return obj;
+}
+var var::operator*(const double a) {
+	var obj = *this;
+	if (obj.i_var != NULL) {
+		obj.i_var *= (int)a;
+	}
+	else if (obj.d_var != NULL) {
+		obj.d_var *= a;
+	}
+	else {
+		char* s = NumberToString((int)a);
+		char* t = obj.GetStr();
+		int s_size = strlen(s);
+		int t_size = strlen(t);
+		int counter = 0;
+		for (int i = 0; i < s_size; i++) {
+			for (int j = 0; j < t_size; j++) {
+				if (s[i] == t[j]) {
+					counter++;
+				}
+			}
+		}
+		char* rez = new char[counter + 1];
+		rez[counter] = '\0';
+		counter = 0;
+		for (int i = 0; i < s_size; i++) {
+			for (int j = 0; j < t_size; j++) {
+				if (s[i] == t[j]) {
+					rez[counter] = s[i];
+					counter++;
+				}
+			}
+		}
+		obj.Setstr_var(rez);
+		delete[] rez;
+		delete[]s;
+	}
+	return obj;
+}
+var var::operator*(const char* s) {
+	var obj = *this;
+	if (obj.i_var != NULL) {
+		obj.i_var *= StringToNumber(s);
+	}
+	else if (obj.d_var != NULL) {
+		obj.d_var *= (double)StringToNumber(s);
+	}
+	else {
+		char* t = obj.GetStr();
+		int s_size = strlen(s);
+		int t_size = strlen(t);
+		int counter = 0;
+		for (int i = 0; i < s_size; i++) {
+			for (int j = 0; j < t_size; j++) {
+				if (s[i] == t[j]) {
+					counter++;
+				}
+			}
+		}
+		char* rez = new char[counter + 1];
+		rez[counter] = '\0';
+		counter = 0;
+		for (int i = 0; i < s_size; i++) {
+			for (int j = 0; j < t_size; j++) {
+				if (s[i] == t[j]) {
+					rez[counter] = s[i];
+					counter++;
+				}
+			}
+		}
+		obj.Setstr_var(rez);
+		delete[] rez;
+	}
+	return obj;
+}
+var var::operator*(var& a) {
+	var obj = *this;
+	if (obj.i_var != NULL) {
+		obj.i_var *= int(a);
+	}
+	else if (obj.d_var != NULL) {
+		obj.d_var *= double(a);
+	}
+	else {
+		char* s = a.GetStr();
+		char* t = obj.GetStr();
+		int s_size = strlen(s);
+		int t_size = strlen(t);
+		int counter = 0;
+		for (int i = 0; i < s_size; i++) {
+			for (int j = 0; j < t_size; j++) {
+				if (s[i] == t[j]) {
+					counter++;
+				}
+			}
+		}
+		char* rez = new char[counter + 1];
+		rez[counter] = '\0';
+		counter = 0;
+		for (int i = 0; i < s_size; i++) {
+			for (int j = 0; j < t_size; j++) {
+				if (s[i] == t[j]) {
+					rez[counter] = s[i];
+					counter++;
+				}
+			}
+		}
+		obj.Setstr_var(rez);
+		delete[] rez;
+	}
+	return obj;
+}
+
+var var::operator/(const int a) {
+	var obj = *this;
+	if (obj.i_var != NULL) {
+		obj.i_var /= a;
+	}
+	else if (obj.d_var != NULL) {
+		obj.d_var /= a;
+	}
+	else {
+		char* s = NumberToString(a);
+		char* t = obj.GetStr();
+		int s_size = strlen(s);
+		int t_size = strlen(t);
+		int counter = 0;
+		bool check = 0;
+		for (int i = 0; i < s_size; i++) {
+			for (int j = 0; j < t_size; j++) {
+				if (s[i] == t[j]) {
+					check = 1;
+					if (check == 0) {
+						counter++;
+						check = 0;
+					}
+				}
+			}
+		}
+		char* rez = new char[counter + 1];
+		rez[counter] = '\0';
+		counter = 0;
+		for (int i = 0; i < s_size; i++) {
+			for (int j = 0; j < t_size; j++) {
+				if (s[i] == t[j]) {
+					check = 1;
+					if (check == 0) {
+						rez[counter] = s[i];
+						counter++;
+						check = 0;
+					}
+				}
+			}
+		}
+		obj.Setstr_var(rez);
+		delete[] rez;
+		delete[]s;
+	}
+	return obj;
+}
+var var::operator/(const double a) {
+	var obj = *this;
+	if (obj.i_var != NULL) {
+		obj.i_var /= (double)a;
+	}
+	else if (obj.d_var != NULL) {
+		obj.d_var /= a;
+	}
+	else {
+		char* s = NumberToString((int)a);
+		char* t = obj.GetStr();
+		int s_size = strlen(s);
+		int t_size = strlen(t);
+		int counter = 0;
+		bool check = 0;
+		for (int i = 0; i < s_size; i++) {
+			for (int j = 0; j < t_size; j++) {
+				if (s[i] == t[j]) {
+					check = 1;
+					if (check == 0) {
+						counter++;
+						check = 0;
+					}
+				}
+			}
+		}
+		char* rez = new char[counter + 1];
+		rez[counter] = '\0';
+		counter = 0;
+		for (int i = 0; i < s_size; i++) {
+			for (int j = 0; j < t_size; j++) {
+				if (s[i] == t[j]) {
+					check = 1;
+					if (check == 0) {
+						rez[counter] = s[i];
+						counter++;
+						check = 0;
+					}
+				}
+			}
+		}
+		obj.Setstr_var(rez);
+		delete[] rez;
+		delete[]s;
+	}
+	return obj;
+}
+var var::operator/(const char* s) {
+	var obj = *this;
+	if (obj.i_var != NULL) {
+		obj.i_var /= StringToNumber(s);
+	}
+	else if (obj.d_var != NULL) {
+		obj.d_var /= StringToNumber(s);
+	}
+	else {
+		char* t = obj.GetStr();
+		int s_size = strlen(s);
+		int t_size = strlen(t);
+		int counter = 0;
+		bool check = 0;
+		for (int i = 0; i < s_size; i++) {
+			for (int j = 0; j < t_size; j++) {
+				if (s[i] == t[j]) {
+					check = 1;
+					if (check == 0) {
+						counter++;
+						check = 0;
+					}
+				}
+			}
+		}
+		char* rez = new char[counter + 1];
+		rez[counter] = '\0';
+		counter = 0;
+		for (int i = 0; i < s_size; i++) {
+			for (int j = 0; j < t_size; j++) {
+				if (s[i] == t[j]) {
+					check = 1;
+					if (check == 0) {
+						rez[counter] = s[i];
+						counter++;
+						check = 0;
+					}
+				}
+			}
+		}
+		obj.Setstr_var(rez);
+		delete[] rez;
+	}
+	return obj;
+}
+var var::operator/(var& a) {
+	var obj = *this;
+	if (obj.i_var != NULL) {
+		obj.i_var /= (int)a;
+	}
+	else if (obj.d_var != NULL) {
+		obj.d_var /= (double)a;
+	}
+	else {
+		char* s = a.GetStr();
+		char* t = obj.GetStr();
+		int s_size = strlen(s);
+		int t_size = strlen(t);
+		int counter = 0;
+		bool check = 0;
+		for (int i = 0; i < s_size; i++) {
+			for (int j = 0; j < t_size; j++) {
+				if (s[i] == t[j]) {
+					check = 1;
+					if (check == 0) {
+						counter++;
+						check = 0;
+					}
+				}
+			}
+		}
+		char* rez = new char[counter + 1];
+		rez[counter] = '\0';
+		counter = 0;
+		for (int i = 0; i < s_size; i++) {
+			for (int j = 0; j < t_size; j++) {
+				if (s[i] == t[j]) {
+					check = 1;
+					if (check == 0) {
+						rez[counter] = s[i];
+						counter++;
+						check = 0;
+					}
+				}
+			}
+		}
+		obj.Setstr_var(rez);
+		delete[] rez;
+	}
+	return obj;
+}
+
+bool var::operator>(int a) {
+	if (i_var != NULL) {
+		return i_var > a ? 1 : 0;
+	}
+	else if (d_var != NULL) {
+		return d_var > (double)a ? 1 : 0;
+	}
+	else {
+		int rez = StringToNumber(str_var.GetStr());
+		return rez > a ? 1 : 0;
+	}
+}
+bool var::operator>=(int a) {
+	if (i_var != NULL) {
+		return i_var >= a ? 1 : 0;
+	}
+	else if (d_var != NULL) {
+		return d_var >= (double)a ? 1 : 0;
+	}
+	else {
+		int rez = StringToNumber(str_var.GetStr());
+		return rez >= a ? 1 : 0;
+	}
+}
+bool var::operator<(int a) {
+	if (i_var != NULL) {
+		return i_var < a ? 1 : 0;
+	}
+	else if (d_var != NULL) {
+		return d_var < (double)a ? 1 : 0;
+	}
+	else {
+		int rez = StringToNumber(str_var.GetStr());
+		return rez < a ? 1 : 0;
+	}
+}
+bool var::operator<=(int a) {
+	if (i_var != NULL) {
+		return i_var <= a ? 1 : 0;
+	}
+	else if (d_var != NULL) {
+		return d_var <= (double)a ? 1 : 0;
+	}
+	else {
+		int rez = StringToNumber(str_var.GetStr());
+		return rez <= a ? 1 : 0;
+	}
+}
+bool var::operator==(int a) {
+	if (i_var != NULL) {
+		return i_var == a ? 1 : 0;
+	}
+	else if (d_var != NULL) {
+		return d_var == (double)a ? 1 : 0;
+	}
+	else {
+		int rez = StringToNumber(str_var.GetStr());
+		return rez == a ? 1 : 0;
+	}
+}
+bool var::operator!=(int a) {
+	if (i_var != NULL) {
+		return i_var != a ? 1 : 0;
+	}
+	else if (d_var != NULL) {
+		return d_var != (double)a ? 1 : 0;
+	}
+	else {
+		int rez = StringToNumber(str_var.GetStr());
+		return rez != a ? 1 : 0;
+	}
+}
+
+bool var::operator>(double a) {
+	if (i_var != NULL) {
+		return i_var > (double)a ? 1 : 0;
+	}
+	else if (d_var != NULL) {
+		return d_var > a ? 1 : 0;
+	}
+	else {
+		int rez = StringToNumber(str_var.GetStr());
+		return (double)rez > a ? 1 : 0;
+	}
+}
+bool var::operator>=(double a) {
+	if (i_var != NULL) {
+		return i_var >= (double)a ? 1 : 0;
+	}
+	else if (d_var != NULL) {
+		return d_var >= a ? 1 : 0;
+	}
+	else {
+		int rez = StringToNumber(str_var.GetStr());
+		return (double)rez >= a ? 1 : 0;
+	}
+}
+bool var::operator<(double a) {
+	if (i_var != NULL) {
+		return i_var < (double)a ? 1 : 0;
+	}
+	else if (d_var != NULL) {
+		return d_var < a ? 1 : 0;
+	}
+	else {
+		int rez = StringToNumber(str_var.GetStr());
+		return (double)rez < a ? 1 : 0;
+	}
+}
+bool var::operator<=(double a) {
+	if (i_var != NULL) {
+		return i_var <= (double)a ? 1 : 0;
+	}
+	else if (d_var != NULL) {
+		return d_var <= a ? 1 : 0;
+	}
+	else {
+		int rez = StringToNumber(str_var.GetStr());
+		return (double)rez <= a ? 1 : 0;
+	}
+}
+bool var::operator==(double a) {
+	if (i_var != NULL) {
+		return i_var == (double)a ? 1 : 0;
+	}
+	else if (d_var != NULL) {
+		return d_var == a ? 1 : 0;
+	}
+	else {
+		int rez = StringToNumber(str_var.GetStr());
+		return (double)rez == a ? 1 : 0;
+	}
+}
+bool var::operator!=(double a) {
+	if (i_var != NULL) {
+		return i_var != (double)a ? 1 : 0;
+	}
+	else if (d_var != NULL) {
+		return d_var != a ? 1 : 0;
+	}
+	else {
+		int rez = StringToNumber(str_var.GetStr());
+		return (double)rez != a ? 1 : 0;
+	}
+}
+
+bool var::operator>(var& a) {
+	if (i_var != NULL) {
+		return i_var > (int)a;
+	}
+	else if (d_var != NULL) {
+		return d_var > (double)a;
+	}
+	else {
+		int l_v = StringToNumber(str_var.GetStr());
+		int r_v = StringToNumber(a.GetStr());
+		return l_v > r_v;
+	}
+}
+bool var::operator>=(var& a) {
+	if (i_var != NULL) {
+		return i_var >= (int)a;
+	}
+	else if (d_var != NULL) {
+		return d_var >= (double)a;
+	}
+	else {
+		int l_v = StringToNumber(str_var.GetStr());
+		int r_v = StringToNumber(a.GetStr());
+		return l_v >= r_v;
+	}
+}
+bool var::operator<(var& a) {
+	if (i_var != NULL) {
+		return i_var < (int)a;
+	}
+	else if (d_var != NULL) {
+		return d_var < (double)a;
+	}
+	else {
+		int l_v = StringToNumber(str_var.GetStr());
+		int r_v = StringToNumber(a.GetStr());
+		return l_v < r_v;
+	}
+}
+bool var::operator<=(var& a) {
+	if (i_var != NULL) {
+		return i_var <= (int)a;
+	}
+	else if (d_var != NULL) {
+		return d_var <= (double)a;
+	}
+	else {
+		int l_v = StringToNumber(str_var.GetStr());
+		int r_v = StringToNumber(a.GetStr());
+		return l_v <= r_v;
+	}
+}
+bool var::operator==(var& a) {
+	if (i_var != NULL) {
+		return i_var == (int)a;
+	}
+	else if (d_var != NULL) {
+		return d_var == (double)a;
+	}
+	else {
+		int l_v = StringToNumber(str_var.GetStr());
+		int r_v = StringToNumber(a.GetStr());
+		return l_v == r_v;
+	}
+}
+bool var::operator!=(var& a) {
+	if (i_var != NULL) {
+		return i_var != (int)a;
+	}
+	else if (d_var != NULL) {
+		return d_var != (double)a;
+	}
+	else {
+		int l_v = StringToNumber(str_var.GetStr());
+		int r_v = StringToNumber(a.GetStr());
+		return l_v != r_v;
+	}
 }
